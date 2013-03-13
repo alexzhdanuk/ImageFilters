@@ -21,7 +21,9 @@ private slots:
 
 private:
     Ui::Dialog *ui;
-QGraphicsScene* m_Scena;
+    QGraphicsScene* m_Scena;
+    QGraphicsItem* m_GraphicsItem;
+    QPixmap m_Pixmap;
 };
 
 #endif // DIALOG_H
