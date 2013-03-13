@@ -25,3 +25,8 @@ void Dialog::on_pushButton_clicked()
     ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
     QGraphicsItem* grafItem = m_Scena->addPixmap(m_Pixmap);
 }
+
+void Dialog::on_pushButton_2_clicked()
+{
+
+}
