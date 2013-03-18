@@ -56,7 +56,7 @@ private:
     QImage m_Image;
     QImage m_outImage;
     QList<rgb> m_listRGB;
-    QList<hsl> m_listHSL;
+    QList<hsv> m_listHSL;
 };
 
 #endif // DIALOG_H
