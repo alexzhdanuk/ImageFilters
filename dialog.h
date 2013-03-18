@@ -8,6 +8,23 @@ namespace Ui {
 class Dialog;
 }
 
+struct rgb
+{
+    double r;       // percent
+    double g;       // percent
+    double b;       // percent
+};
+
+struct hsv
+{
+    double h;       // angle in degrees
+    double s;       // percent
+    double v;       // percent
+};
+
+
+
+
 class Dialog : public QDialog
 {
     Q_OBJECT
@@ -21,6 +38,9 @@ private slots:
     void testFunc();
     void on_pushButton_2_clicked();
     void setState(bool state);
+    hsv rgb2hsv(rgb in);
+    rgb hsv2rgb(hsv in);
+
 
     void on_horizontalSlider_valueChanged(int value);
 
@@ -33,7 +53,8 @@ private:
     QPixmap m_Pixmap;
     QImage m_Image;
     QImage m_outImage;
-
+    QList<rgb> m_listRGB;
+    QList<hsl> m_listHSL;
 };
 
 #endif // DIALOG_H
