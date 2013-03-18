@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>684</width>
-    <height>403</height>
+    <width>851</width>
+    <height>532</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,19 +18,22 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>431</width>
-     <height>371</height>
+     <width>581</width>
+     <height>501</height>
     </rect>
    </property>
   </widget>
   <widget class="QSlider" name="Slider">
    <property name="geometry">
     <rect>
-     <x>480</x>
-     <y>90</y>
-     <width>160</width>
+     <x>650</x>
+     <y>110</y>
+     <width>151</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="tracking">
+    <bool>false</bool>
    </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
@@ -39,26 +42,26 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>470</x>
-     <y>20</y>
+     <x>640</x>
+     <y>40</y>
      <width>191</width>
      <height>31</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>25</pointsize>
+     <pointsize>20</pointsize>
     </font>
    </property>
    <property name="text">
-    <string>Settings picture</string>
+    <string>Размытие фотографии</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>560</x>
-     <y>350</y>
+     <x>730</x>
+     <y>370</y>
      <width>114</width>
      <height>32</height>
     </rect>
@@ -70,14 +73,89 @@
   <widget class="QPushButton" name="pushButton_2">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>350</y>
+     <x>610</x>
+     <y>370</y>
      <width>114</width>
      <height>32</height>
     </rect>
    </property>
    <property name="text">
     <string>Add picture</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>80</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Размер области</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>150</y>
+     <width>161</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Жосткость</string>
+   </property>
+  </widget>
+  <widget class="QSlider" name="horizontalSlider">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>180</y>
+     <width>151</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelSize">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>110</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelZost">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>180</y>
+     <width>31</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>

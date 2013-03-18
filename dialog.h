@@ -18,8 +18,13 @@ public:
     int gaussCoef(double sigma, double a[3], double *b0);
 private slots:
     void on_pushButton_clicked();
-    void testFunc(QImage* img,int kernel_size);
+    void testFunc();
     void on_pushButton_2_clicked();
+    void setState(bool state);
+
+    void on_horizontalSlider_valueChanged(int value);
+
+    void on_Slider_valueChanged(int value);
 
 private:
     Ui::Dialog *ui;
@@ -27,6 +32,8 @@ private:
     QGraphicsItem* m_GraphicsItem;
     QPixmap m_Pixmap;
     QImage m_Image;
+    QImage m_outImage;
+
 };
 
 #endif // DIALOG_H
