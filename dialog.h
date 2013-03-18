@@ -46,6 +46,8 @@ private slots:
 
     void on_Slider_valueChanged(int value);
 
+    void on_ButtonColourMsk_clicked();
+
 private:
     Ui::Dialog *ui;
     QGraphicsScene* m_Scena;

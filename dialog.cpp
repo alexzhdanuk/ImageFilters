@@ -707,3 +707,8 @@ static __inline BYTE ScaledPixelClip(int i) {
 
 
 */
+
+void Dialog::on_ButtonColourMsk_clicked()
+{
+
+}

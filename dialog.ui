@@ -158,6 +158,19 @@
     <string/>
    </property>
   </widget>
+  <widget class="QPushButton" name="ButtonColourMsk">
+   <property name="geometry">
+    <rect>
+     <x>610</x>
+     <y>410</y>
+     <width>114</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Set mask</string>
+   </property>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
