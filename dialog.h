@@ -22,6 +22,12 @@ struct hsv
     double v;       // percent
 };
 
+struct hsl
+{
+    double h;       // angle in degrees
+    double s;       // percent
+    double l;       // percent
+};
 
 
 
@@ -40,6 +46,9 @@ private slots:
     void setState(bool state);
     hsv rgb2hsv(rgb in);
     rgb hsv2rgb(hsv in);
+    hsl rgbToHsl(rgb in);
+    double hue2rgb(double p,double q,double t);
+    rgb  hslToRgb(hsl in);
 
 
     void on_horizontalSlider_valueChanged(int value);

@@ -13,7 +13,9 @@ Dialog::Dialog(QWidget *parent) :
     m_Scena = new QGraphicsScene();
     m_Scena->setSceneRect(0,0,400,400);
     ui->graphicsView->setScene(m_Scena);
-    ui->Slider->setRange(0,200);
+    ui->Slider->setRange(0,100);
+    ui->SliderColour->setRange(0,200);
+    ui->SliderShine->setRange(0,200);
     ui->horizontalSlider->setRange(1,8);
     QString str = QString::number(0)+"%";
     ui->labelSize->setText(str);
@@ -192,6 +194,7 @@ void Dialog::on_ButtonColourMsk_clicked()
     int height = m_Image.height();
     rgb structRgb;
     hsv structHsv;
+    hsl structHsl;
     QRgb col;
 
     for (int x = 0; x < width; x++)
@@ -204,9 +207,13 @@ void Dialog::on_ButtonColourMsk_clicked()
             structRgb.b = qBlue(col);
             //m_listRGB << structRgb;
             structHsv = rgb2hsv(structRgb);
-            structHsv.v=structHsv.v*ui->Slider->value()/100.0;
-            if(structHsv.v>1) structHsv.v = 1;
+            structHsv.s=structHsv.s*ui->SliderColour->value()/100.0;
+            if(structHsv.s>1) structHsv.s = 1;
             structRgb = hsv2rgb(structHsv);
+            //structHsl = rgbToHsl(structRgb);
+            //structHsl.l=structHsl.l*ui->SliderShine->value()/100.0;
+            //if(structHsl.l>1) structHsl.l = 1;
+            //structRgb = hslToRgb(structHsl);
             m_outImage.setPixel(x,y,qRgb(structRgb.r,structRgb.g,structRgb.b));
         }
     }
@@ -292,3 +299,84 @@ rgb Dialog::hsv2rgb(hsv in)
     return out;
 }
 
+
+
+hsl Dialog::rgbToHsl(rgb in)
+{
+    double r,g,b;
+    hsl out;
+
+    r = in.r/255;
+    g = in.g/255;
+    b = in.b/255;
+    double max = qMax(r, qMax(g, b));
+    double min = qMax(r, qMax(g, b));
+    double h, s, l = (max + min) / 2;
+
+    if(max == min){
+        h = s = 0; // achromatic
+    }else{
+        double d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if(r>=max)
+        {
+            h = (g - b) / d + (g < b ? 6 : 0);
+        }
+        if(g>=max)
+        {
+           h = (b - r) / d + 2;
+        }
+
+        if(b>=max)
+        {
+             h = (r - g) / d + 4;
+        }
+
+
+        h /= 6;
+    }
+    out.h = h;
+    out.l = l;
+    out.s = s;
+
+    return out;
+}
+
+double Dialog::hue2rgb(double p,double q,double t)
+{
+    if(t < 0) t += 1;
+    if(t > 1) t -= 1;
+    if(t < 1/6) return p + (q - p) * 6 * t;
+    if(t < 1/2) return q;
+    if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+}
+
+
+rgb  Dialog::hslToRgb(hsl in)
+{
+    rgb out;
+    double h,s,l;
+    double r, g, b;
+
+    h=in.h;
+    s=in.s;
+    l=in.l;
+
+    if(s == 0){
+        r = g = b = l; // achromatic
+    }
+    else
+    {
+        double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        double p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+    out.r = r*255;
+    out.g = g*255;
+    out.b = b*255;
+
+    return out;
+}
