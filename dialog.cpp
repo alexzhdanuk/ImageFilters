@@ -382,3 +382,13 @@ rgb  Dialog::hslToRgb(hsl in)
 
     return out;
 }
+
+void Dialog::on_SliderColour_valueChanged(int value)
+{
+
+}
+
+void Dialog::on_SliderShine_valueChanged(int value)
+{
+
+}
