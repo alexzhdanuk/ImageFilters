@@ -209,6 +209,8 @@ void Dialog::on_ButtonColourMsk_clicked()
             structHsv = rgb2hsv(structRgb);
             structHsv.s=structHsv.s*ui->SliderColour->value()/100.0;
             if(structHsv.s>1) structHsv.s = 1;
+            structHsv.v=structHsv.v*ui->SliderShine->value()/100.0;
+            if(structHsv.v>1) structHsv.v = 1;
             structRgb = hsv2rgb(structHsv);
             //structHsl = rgbToHsl(structRgb);
             //structHsl.l=structHsl.l*ui->SliderShine->value()/100.0;
