@@ -49,7 +49,7 @@ private slots:
     hsl rgbToHsl(rgb in);
     double hue2rgb(double p,double q,double t);
     rgb  hslToRgb(hsl in);
-
+    QImage addColour(int value);
 
     void on_horizontalSlider_valueChanged(int value);
 
@@ -66,10 +66,12 @@ private:
     QGraphicsScene* m_Scena;
     QGraphicsItem* m_GraphicsItem;
     QPixmap m_Pixmap;
+    QByteArray m_array;
     QImage m_Image;
     QImage m_outImage;
-    QList<rgb> m_listRGB;
-    QList<hsv> m_listHSL;
+    unsigned char *m_listImageIn;
+    unsigned char *m_listImageOut;
+    ;
 };
 
 #endif // DIALOG_H

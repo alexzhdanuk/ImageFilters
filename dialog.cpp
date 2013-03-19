@@ -4,6 +4,7 @@
 #include <QtCore/qmath.h>
 #include <QDebug>
 #include <math.h>
+#include <QBuffer>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -20,7 +21,9 @@ Dialog::Dialog(QWidget *parent) :
     QString str = QString::number(0)+"%";
     ui->labelSize->setText(str);
     ui->labelZost->setText(QString::number(1));
-
+    ui->labelShine->setText(str);
+    ui->labelColour->setText(str);
+    ui->SliderColour->setValue(100);
 }
 
 Dialog::~Dialog()
@@ -47,7 +50,12 @@ void Dialog::on_pushButton_2_clicked()
 {
     QString file = QFileDialog::getOpenFileName(this,"","");
     m_Image.load(file);
-    m_outImage.load(file);
+    m_Image  = m_Image.convertToFormat(QImage::Format_ARGB32);
+
+    m_listImageIn = m_Image.bits();
+    m_listImageOut = new unsigned char[m_Image.byteCount()];
+
+
     m_Pixmap = m_Pixmap.fromImage(m_Image);
     m_Scena->setSceneRect(0,0,m_Image.width(),m_Image.height());
     ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
@@ -315,9 +323,12 @@ hsl Dialog::rgbToHsl(rgb in)
     double min = qMax(r, qMax(g, b));
     double h, s, l = (max + min) / 2;
 
-    if(max == min){
+    if(max == min)
+    {
         h = s = 0; // achromatic
-    }else{
+    }
+    else
+    {
         double d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
         if(r>=max)
@@ -328,12 +339,10 @@ hsl Dialog::rgbToHsl(rgb in)
         {
            h = (b - r) / d + 2;
         }
-
         if(b>=max)
         {
              h = (r - g) / d + 4;
         }
-
 
         h /= 6;
     }
@@ -385,10 +394,48 @@ rgb  Dialog::hslToRgb(hsl in)
 
 void Dialog::on_SliderColour_valueChanged(int value)
 {
+    if(m_Pixmap.size() == QSize(0,0)) return;
+
+
+    QString str = " %";
+    ui->labelColour->setText(QString::number(value)+str);
+
+
+    m_Scena->removeItem(m_GraphicsItem);
+    delete m_GraphicsItem;
+
+    m_Scena->setSceneRect(0,0,m_outImage.width(),m_outImage.height());
+    ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
+    m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(addColour(value)));
 
 }
 
 void Dialog::on_SliderShine_valueChanged(int value)
 {
+    QString str = " %";
+    ui->labelShine->setText(QString::number(value)+str);
+}
 
+
+QImage Dialog::addColour(int value)
+{
+    rgb structRgb;
+    hsv structHsv;
+
+    for(int i=0; i<m_Image.byteCount();i+=4)
+    {
+        structRgb.b = m_listImageIn[i];
+        structRgb.g = m_listImageIn[i+1];
+        structRgb.r = m_listImageIn[i+2];
+        structHsv = rgb2hsv(structRgb);
+        structHsv.s=structHsv.s*value/100.0;
+        if(structHsv.s>1) structHsv.s = 1;
+        structRgb = hsv2rgb(structHsv);
+        m_listImageOut[i] = structRgb.b;
+        m_listImageOut[i+1] = structRgb.g;
+        m_listImageOut[i+2] = structRgb.r;
+        m_listImageOut[i+3] = m_listImageIn[i+3];
+    }
+
+    return  QImage((unsigned char *)m_listImageOut,m_Image.width(),m_Image.height(),m_Image.format());
 }
