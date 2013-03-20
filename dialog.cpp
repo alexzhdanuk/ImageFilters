@@ -401,12 +401,14 @@ void Dialog::on_SliderColour_valueChanged(int value)
     ui->labelColour->setText(QString::number(value)+str);
 
 
-    m_Scena->removeItem(m_GraphicsItem);
-    delete m_GraphicsItem;
+    //m_Scena->removeItem(m_GraphicsItem);
+    //delete m_GraphicsItem;
 
-    m_Scena->setSceneRect(0,0,m_outImage.width(),m_outImage.height());
-    ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
-    m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(addColour(value)));
+    addColour(value);
+
+    //m_Scena->setSceneRect(0,0,m_outImage.width(),m_outImage.height());
+    //ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
+    //m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(addColour(value)));
 
 }
 
