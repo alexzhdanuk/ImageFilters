@@ -61,6 +61,10 @@ private slots:
 
     void on_SliderShine_valueChanged(int value);
 
+    void on_checkSepia_clicked();
+
+    void on_SliderContrast_valueChanged(int value);
+
 private:
     Ui::Dialog *ui;
     QGraphicsScene* m_Scena;

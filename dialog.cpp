@@ -441,3 +441,13 @@ QImage Dialog::addColour(int value)
 
     return  QImage((unsigned char *)m_listImageOut,m_Image.width(),m_Image.height(),m_Image.format());
 }
+
+void Dialog::on_checkSepia_clicked()
+{
+
+}
+
+void Dialog::on_SliderContrast_valueChanged(int value)
+{
+
+}
