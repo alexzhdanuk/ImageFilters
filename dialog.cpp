@@ -5,6 +5,9 @@
 #include <QDebug>
 #include <math.h>
 #include <QBuffer>
+#include <qmessagebox.h>
+#include <qapplication.h>
+
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -17,33 +20,65 @@ Dialog::Dialog(QWidget *parent) :
     ui->Slider->setRange(0,100);
     ui->SliderColour->setRange(0,200);
     ui->SliderShine->setRange(0,200);
+	ui->SliderSepia->setRange(0,100);
+	ui->SliderColour->setValue(100);
+	ui->SliderShine->setValue(100);
+	
+	ui->SliderBlue->setRange(0,100);
+	ui->SliderGreen->setRange(0,100);
+	ui->SliderRed->setRange(0,100);
+	ui->SliderContrast->setRange(0,100);
+	ui->SliderContrast->setValue(50);
+	ui->SliderRed->setValue(50);
+	ui->SliderGreen->setValue(50);
+	ui->SliderBlue->setValue(50);
+	ui->progressBar->setValue(0);
+
+
+
     ui->horizontalSlider->setRange(1,8);
     QString str = QString::number(0)+"%";
     ui->labelSize->setText(str);
     ui->labelZost->setText(QString::number(1));
     ui->labelShine->setText(str);
     ui->labelColour->setText(str);
-    ui->SliderColour->setValue(100);
+    
+	connect(ui->SliderSepia,SIGNAL(valueChanged(int)),this,SLOT(onSliderSepia(int)));
+
+	connect(ui->SliderBlue,SIGNAL(valueChanged(int)),this,SLOT(onRgbSliders(int)));
+	connect(ui->SliderGreen,SIGNAL(valueChanged(int)),this,SLOT(onRgbSliders(int)));
+	connect(ui->SliderRed,SIGNAL(valueChanged(int)),this,SLOT(onRgbSliders(int)));
+	connect(ui->ButtonTexture,SIGNAL(clicked()),this,SLOT(onTexture()));
+
 }
+
+void Dialog::setState(bool state)
+{
+    ui->horizontalSlider->setEnabled(state);
+    ui->Slider->setEnabled(state);
+    ui->pushButton_2->setEnabled(state);
+}
+
 
 Dialog::~Dialog()
 {
     delete ui;
 }
 
-void Dialog::on_pushButton_clicked()
+void Dialog::onTexture()
 {
-    if(m_Pixmap.size() == QSize(0,0)) return;
-       setState(false);
-       testFunc();
-       m_Scena->removeItem(m_GraphicsItem);
-       delete m_GraphicsItem;
+	QString file = QFileDialog::getOpenFileName(this,"","");
+	m_Texture.load(file);
+	m_Texture = m_Texture.convertToFormat(QImage::Format_ARGB32);
+	m_Texture = m_Texture.scaled(m_Image.width(),m_Image.height());
+	m_listTexture = m_Texture.bits();
 
-       m_Scena->setSceneRect(0,0,m_outImage.width(),m_outImage.height());
-       ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
-       m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(m_outImage));
-       setState(true);
+	m_Scena->removeItem(m_GraphicsItem);
+    delete m_GraphicsItem;
 
+    m_Scena->setSceneRect(0,0,m_Image.width(),m_Image.height());
+    ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
+	m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(addTexture()));
 }
 
 void Dialog::on_pushButton_2_clicked()
@@ -64,191 +99,195 @@ void Dialog::on_pushButton_2_clicked()
 
 }
 
-
-void Dialog::testFunc()
-{
-
-    if(ui->Slider->value()==0) return;
-    qDebug()<<ui->Slider->value();
-    QRgb col;
-    int width = m_Image.width();
-    int height = m_Image.height();
-    int otstWidth = ((width/2)*(ui->Slider->value()/100.0));
-    int otstHeight = ((height/2)*(ui->Slider->value()/100.0));
-
-    double kernel[17][17] = {
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
-
-
-
-    int kernelWidth = 1 + 2*ui->horizontalSlider->value();
-    int kernelHeight = 1 + 2*ui->horizontalSlider->value();
-
-    setState(false);
-
-    for (int x = 0; x < width; x++)
-    {
-        for (int y = 0; y < height; y++)
-        {
-            double rSum = 0, gSum = 0, bSum = 0, kSum = 0;
-
-
-            if(((x >= otstWidth && x<=width-otstWidth) && (y >= otstHeight &&  y<= height-otstHeight)) && (otstHeight != height && otstWidth != width))
-            {
-                col = m_Image.pixel(x, y);
-                unsigned char r = qRed(col);
-                unsigned char g = qGreen(col);
-                unsigned char b = qBlue(col);
-                m_outImage.setPixel(x,y,qRgb(r,g,b));
-                continue;
-            }
-
-
-
-            for (int i = 0; i < kernelWidth; i++)
-            {
-                for (int j = 0; j < kernelHeight; j++)
-                {
-                    int pixelPosX = x + (i - (kernelWidth / 2));
-                    int pixelPosY = y + (j - (kernelHeight / 2));
-                    if ((pixelPosX < 0) ||
-                        (pixelPosX >= width) ||
-                        (pixelPosY < 0) ||
-                        (pixelPosY >= height)) continue;
-
-                    col = m_Image.pixel(pixelPosX, pixelPosY);
-                    unsigned char r = qRed(col);
-                    unsigned char g = qGreen(col);
-                    unsigned char b = qBlue(col);
-
-
-                    double kernelVal = kernel[i][j];
-
-                    rSum += r * kernelVal;
-                    gSum += g * kernelVal;
-                    bSum += b * kernelVal;
-
-                    kSum += kernelVal;
-                }
-            }
-
-            if (kSum <= 0) kSum = 1;
-            //kSum = 30;
-            rSum /= kSum;
-            if (rSum < 0) rSum = 0;
-            if (rSum > 255) rSum = 255;
-
-            gSum /= kSum;
-            if (gSum < 0) gSum = 0;
-            if (gSum > 255) gSum = 255;
-
-            bSum /= kSum;
-            if (bSum < 0) bSum = 0;
-            if (bSum > 255) bSum = 255;
-
-            m_outImage.setPixel(x,y,qRgb(rSum,gSum,bSum));
-          }
-    }
-
-}
-
-
 void Dialog::on_horizontalSlider_valueChanged(int value)
 {
+	
     //slider of zhost
     ui->labelZost->setText(QString::number(value));
+	if(m_Pixmap.size() == QSize(0,0)) return;
+    
+	setState(false);
+    m_Scena->removeItem(m_GraphicsItem);
+    delete m_GraphicsItem;
 
+    m_Scena->setSceneRect(0,0,m_Image.width(),m_Image.height());
+    ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
+	m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(addBlur(value)));
+    setState(true);
+	ui->progressBar->setValue(0);
+	QMessageBox::information(0,"Work","already is done!!!");
 }
 
 void Dialog::on_Slider_valueChanged(int value)
 {
     QString str = QString::number(value)+"%";
     ui->labelSize->setText(str);
-
-    //slider of oblast
-
-
-}
-
-void Dialog::setState(bool state)
-{
-    ui->horizontalSlider->setEnabled(state);
-    ui->Slider->setEnabled(state);
-    ui->pushButton->setEnabled(state);
-    ui->pushButton_2->setEnabled(state);
-
-}
-
-void Dialog::on_ButtonColourMsk_clicked()
-{
-
-    int width  = m_Image.width();
-    int height = m_Image.height();
-    rgb structRgb;
-    hsv structHsv;
-    hsl structHsl;
-    QRgb col;
-
-    for (int x = 0; x < width; x++)
-    {
-        for (int y = 0; y < height; y++)
-        {
-            col = m_Image.pixel(x, y);
-            structRgb.r = qRed(col);
-            structRgb.g = qGreen(col);
-            structRgb.b = qBlue(col);
-            //m_listRGB << structRgb;
-            structHsv = rgb2hsv(structRgb);
-            structHsv.s=structHsv.s*ui->SliderColour->value()/100.0;
-            if(structHsv.s>1) structHsv.s = 1;
-            structHsv.v=structHsv.v*ui->SliderShine->value()/100.0;
-            if(structHsv.v>1) structHsv.v = 1;
-            structRgb = hsv2rgb(structHsv);
-            //structHsl = rgbToHsl(structRgb);
-            //structHsl.l=structHsl.l*ui->SliderShine->value()/100.0;
-            //if(structHsl.l>1) structHsl.l = 1;
-            //structRgb = hslToRgb(structHsl);
-            m_outImage.setPixel(x,y,qRgb(structRgb.r,structRgb.g,structRgb.b));
-        }
-    }
-
-    m_Scena->removeItem(m_GraphicsItem);
+	if(m_Pixmap.size() == QSize(0,0)) return;
+    
+	setState(false);
+    
+	m_Scena->removeItem(m_GraphicsItem);
     delete m_GraphicsItem;
 
     m_Scena->setSceneRect(0,0,m_outImage.width(),m_outImage.height());
     ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
-    m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(m_outImage));
+	m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(addBlur(ui->horizontalSlider->value())));
+    setState(true);
+
+	QMessageBox::information(0,"Work","already is done!!!");
+}
+
+void Dialog::on_SliderColour_valueChanged(int value)
+{
+    if(m_Pixmap.size() == QSize(0,0)) return;
+
+    QString str = " %";
+    ui->labelColour->setText(QString::number(value)+str);
+
+    m_Scena->removeItem(m_GraphicsItem);
+    delete m_GraphicsItem;
+
+    m_Scena->setSceneRect(0,0,m_Image.width(),m_Image.height());
+    ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
+    m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(addColour(value)));
 
 }
 
+void Dialog::on_SliderShine_valueChanged(int value)
+{
+	if(m_Pixmap.size() == QSize(0,0)) return;
+
+    QString str = " %";
+    ui->labelShine->setText(QString::number(value)+str);
+	
+    m_Scena->removeItem(m_GraphicsItem);
+    delete m_GraphicsItem;
+
+    m_Scena->setSceneRect(0,0,m_Image.width(),m_Image.height());
+    ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
+    m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(addShine(value)));
 
 
+}
+
+void Dialog::on_SliderContrast_valueChanged(int value)
+{
+	
+    QString str = " %";
+	ui->labelContrast->setText(QString::number(value-50)+str);
+	
+	if(m_Pixmap.size() == QSize(0,0)) return;
+	 m_Scena->removeItem(m_GraphicsItem);
+    delete m_GraphicsItem;
+
+    m_Scena->setSceneRect(0,0,m_Image.width(),m_Image.height());
+    ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
+	m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(contrastFilter(value)));
+}
+
+void Dialog::onSliderSepia(int value)
+{
+	
+    QString str = " %";
+    ui->labelSepia->setText(QString::number(value)+str);
+	
+	if(m_Pixmap.size() == QSize(0,0)) return;
+	int optionsSepia = value==0 ? 80 : value/5+80;
+
+    m_Scena->removeItem(m_GraphicsItem);
+    delete m_GraphicsItem;
+
+    m_Scena->setSceneRect(0,0,m_Image.width(),m_Image.height());
+    ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
+	m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(sepiaEffects(optionsSepia)));
+}
+
+void Dialog::onRgbSliders(int value)
+{	
+	rgb options;
+	options.r = ((255/100)*(ui->SliderRed->value()-50));
+	options.g = ((255/100)*(ui->SliderGreen->value()-50));
+	options.b = ((255/100)*(ui->SliderBlue->value()-50));
+	QString str = " %";
+    ui->labelBlue->setText(QString::number(ui->SliderBlue->value()-50)+str);
+	ui->labelGreen->setText(QString::number(ui->SliderGreen->value()-50)+str);
+	ui->labelRed->setText(QString::number(ui->SliderRed->value()-50)+str);
+	
+	if(m_Pixmap.size() == QSize(0,0)) return;
+	
+	m_Scena->removeItem(m_GraphicsItem);
+    delete m_GraphicsItem;
+
+    m_Scena->setSceneRect(0,0,m_Image.width(),m_Image.height());
+    ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
+	m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(colourFilter(options)));
+
+}
+
+//------------------------------------------------------------------
+
+double Dialog::Max(double a,double b,double c)
+{
+	double max;
+	max = a;
+	if(max<b) max = b;
+	if(max<c) max = c;
+	return max;
+}
+
+double Dialog::Min(double a,double b,double c)
+{
+	double min;
+	min = a;
+	if(min>b) min = b;
+	if(min>c) min = c;
+	return min;
+}
+
+int Dialog::Gray(rgb structRgb)
+{
+	int gray;
+	gray = static_cast<int>(structRgb.r*0.30+structRgb.g*0.59+structRgb.b*0.11);
+	return gray;
+}
+
+rgb  Dialog::hslToRgb(hsl in)
+{
+    rgb out;
+    double h,s,l;
+    double r, g, b;
+
+    h=in.h;
+    s=in.s;
+    l=in.l;
+
+    if(s == 0){
+        r = g = b = l; // achromatic
+    }
+    else
+    {
+        double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        double p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+    out.r = r*255;
+    out.g = g*255;
+    out.b = b*255;
+
+    return out;
+}
 
 hsv Dialog::rgb2hsv(rgb in)
 {
-    hsv         out;
+     hsv         out;
     double      min, max, delta;
     double r,g,b;
 
     r = in.r/255.0, g = in.g/255.0, b = in.b/255.0;
-    max = qMax(r, qMax(g, b));
-    min = qMin(r, qMin(g, b));
+    max = Max(r, g, b);
+    min = Min(r, g, b);
     out.v = max;
 
     delta = max - min;
@@ -280,7 +319,6 @@ hsv Dialog::rgb2hsv(rgb in)
     return out;
 }
 
-
 rgb Dialog::hsv2rgb(hsv in)
 {
     rgb         out;
@@ -309,47 +347,45 @@ rgb Dialog::hsv2rgb(hsv in)
     return out;
 }
 
-
-
 hsl Dialog::rgbToHsl(rgb in)
 {
-    double r,g,b;
+    double r,g,b,min,max;
     hsl out;
 
     r = in.r/255;
     g = in.g/255;
     b = in.b/255;
-    double max = qMax(r, qMax(g, b));
-    double min = qMax(r, qMax(g, b));
-    double h, s, l = (max + min) / 2;
+    max = Max(r, g, b);
+    min = Min(r, g, b);
+    //double h, s;
+	out.l = (max + min) / 2;
 
     if(max == min)
     {
-        h = s = 0; // achromatic
+        out.h = out.s = 0; // achromatic
     }
     else
     {
         double d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        if(r>=max)
+        if(out.l > 0.5) out.s = d / (2 - max - min);
+		else out.s = d / (max + min);
+		
+		if(r>=max)
         {
-            h = (g - b) / d + (g < b ? 6 : 0);
+            out.h = (g - b) / d + (g < b ? 6 : 0);
         }
         if(g>=max)
         {
-           h = (b - r) / d + 2;
+           out.h = (b - r) / d + 2;
         }
         if(b>=max)
         {
-             h = (r - g) / d + 4;
+             out.h = (r - g) / d + 4;
         }
 
-        h /= 6;
+        out.h /= 6;
     }
-    out.h = h;
-    out.l = l;
-    out.s = s;
-
+    
     return out;
 }
 
@@ -363,61 +399,142 @@ double Dialog::hue2rgb(double p,double q,double t)
     return p;
 }
 
+//------------------------------------------------------------------
 
-rgb  Dialog::hslToRgb(hsl in)
+QImage Dialog::sepiaEffects(int val)
 {
-    rgb out;
-    double h,s,l;
-    double r, g, b;
 
-    h=in.h;
-    s=in.s;
-    l=in.l;
-
-    if(s == 0){
-        r = g = b = l; // achromatic
-    }
-    else
-    {
-        double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        double p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1/3);
-        g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1/3);
-    }
-    out.r = r*255;
-    out.g = g*255;
-    out.b = b*255;
-
-    return out;
+	int gray;
+	rgb structRgb;
+	
+	for(int i=0; i<m_Image.byteCount();i+=4)
+    {       
+			structRgb.b = m_listImageIn[i];
+			structRgb.g = m_listImageIn[i+1];
+			structRgb.r = m_listImageIn[i+2];
+            gray = Gray(structRgb);
+            gray = gray*(val/100.0);
+			m_listImageOut[i] = gray*0.82;
+			m_listImageOut[i+1] = gray*0.95;
+			m_listImageOut[i+2] = gray;
+			m_listImageOut[i+3] = m_listImageIn[i+3];
+        }
+	return  QImage((unsigned char *)m_listImageOut,m_Image.width(),m_Image.height(),m_Image.format());   
 }
 
-void Dialog::on_SliderColour_valueChanged(int value)
+QImage Dialog::colourFilter(rgb options)
 {
-    if(m_Pixmap.size() == QSize(0,0)) return;
+	rgb structRgb;
 
-
-    QString str = " %";
-    ui->labelColour->setText(QString::number(value)+str);
-
-
-    //m_Scena->removeItem(m_GraphicsItem);
-    //delete m_GraphicsItem;
-
-    addColour(value);
-
-    //m_Scena->setSceneRect(0,0,m_outImage.width(),m_outImage.height());
-    //ui->graphicsView->fitInView(m_Scena->sceneRect(),Qt::KeepAspectRatio);
-    //m_GraphicsItem = m_Scena->addPixmap(QPixmap::fromImage(addColour(value)));
-
+	for(int i=0; i<m_Image.byteCount();i+=4)
+    {       
+			structRgb.b = m_listImageIn[i];
+			structRgb.g = m_listImageIn[i+1];
+			structRgb.r = m_listImageIn[i+2];
+            if(structRgb.r+options.r>=255) structRgb.r = 255;
+            else
+            {
+                if(structRgb.r+options.r<0)
+                {
+                    structRgb.r = 0;
+                    break;
+                }
+                structRgb.r+=options.r;
+            }
+			if(structRgb.g+options.g>=255) structRgb.g = 255;
+               else
+               {
+                   if(structRgb.g+options.g<0)
+                   {
+                       structRgb.g = 0;
+                       break;
+                   }
+                   structRgb.g+=options.g;
+               }
+               if(structRgb.b+options.b>=255) structRgb.b = 255;
+               else
+               {
+                   if(structRgb.b+options.b<0)
+                   {
+                       structRgb.b = 0;
+                       break;
+                   }
+                   structRgb.b+=options.b;
+               }
+			
+			m_listImageOut[i] = structRgb.b;
+			m_listImageOut[i+1] = structRgb.g;
+			m_listImageOut[i+2] = structRgb.r;
+			m_listImageOut[i+3] = m_listImageIn[i+3];
+        }
+	return  QImage((unsigned char *)m_listImageOut,m_Image.width(),m_Image.height(),m_Image.format());
 }
 
-void Dialog::on_SliderShine_valueChanged(int value)
+QImage Dialog::contrastFilter(int value)
 {
-    QString str = " %";
-    ui->labelShine->setText(QString::number(value)+str);
+		const int L = 256;
+		rgb structRgb;
+        int b[L];
+
+        int imageRows = m_Image.height();
+        int imageCols = m_Image.width();
+
+        int lAB = 0;
+        
+        for(int i=0; i<m_Image.byteCount();i+=4)
+		{       
+			structRgb.b = m_listImageIn[i];
+			structRgb.g = m_listImageIn[i+1];
+			structRgb.r = m_listImageIn[i+2];
+        
+            lAB += (int)(structRgb.r * 0.299 + structRgb.g * 0.587 + structRgb.b * 0.114);
+        }
+
+        lAB /= imageRows * imageCols;
+
+        double k = 1.0 + value / 100.0;
+
+        for (int i = 0; i < L; i++)
+            {
+                int delta = (int)i - lAB;
+                int temp  = (int)(lAB + k *delta);
+
+                if (temp < 0)
+                    temp = 0;
+
+                if (temp >= 255)
+                    temp = 255;
+                b[i] = (unsigned char)temp;
+            }
+
+        for(int i=0; i<m_Image.byteCount();i+=4)
+		{       
+			m_listImageOut[i] = b[(int)m_listImageIn[i]];
+			m_listImageOut[i+1] = b[(int)m_listImageIn[i+1]];
+			m_listImageOut[i+2] = b[(int)m_listImageIn[i+2]];
+			m_listImageOut[i+3] = m_listImageIn[i+3];
+        
+         }
+
+
+
+	return  QImage((unsigned char *)m_listImageOut,m_Image.width(),m_Image.height(),m_Image.format());
 }
 
+QImage Dialog::addTexture()
+{
+	
+	for(int i=0; i<m_Image.byteCount();i+=4)
+    { 
+		m_listImageOut[i]   = m_listImageIn[i]*m_listTexture[i]/255;
+		m_listImageOut[i+1] = m_listImageIn[i+1]*m_listTexture[i+1]/255;
+		m_listImageOut[i+2] = m_listImageIn[i+2]*m_listTexture[i+2]/255;
+		m_listImageOut[i+3] = m_listImageIn[i+3];
+
+	}
+	
+	return  QImage((unsigned char *)m_listImageOut,m_Image.width(),m_Image.height(),m_Image.format());
+}
 
 QImage Dialog::addColour(int value)
 {
@@ -442,12 +559,116 @@ QImage Dialog::addColour(int value)
     return  QImage((unsigned char *)m_listImageOut,m_Image.width(),m_Image.height(),m_Image.format());
 }
 
-void Dialog::on_checkSepia_clicked()
-{
 
+QImage Dialog::addShine(int value)
+{
+    rgb structRgb;
+    hsv structHsv;
+
+    for(int i=0; i<m_Image.byteCount();i+=4)
+    {
+        //structRgb.b = m_listImageIn[i];
+        //structRgb.g = m_listImageIn[i+1];
+        //structRgb.r = m_listImageIn[i+2];
+		structRgb.b = m_listImageOut[i];
+        structRgb.g = m_listImageOut[i+1];
+        structRgb.r = m_listImageOut[i+2];
+		
+		structHsv = rgb2hsv(structRgb);
+        structHsv.v=structHsv.v*value/100.0;
+        if(structHsv.v>1) structHsv.v = 1;
+		structRgb = hsv2rgb(structHsv);
+        m_listImageOut[i] = structRgb.b;
+        m_listImageOut[i+1] = structRgb.g;
+        m_listImageOut[i+2] = structRgb.r;
+        m_listImageOut[i+3] = m_listImageIn[i+3];
+    }
+
+    return  QImage((unsigned char *)m_listImageOut,m_Image.width(),m_Image.height(),m_Image.format());
 }
 
-void Dialog::on_SliderContrast_valueChanged(int value)
+QImage Dialog::addBlur(int value)
 {
 
+	if(ui->Slider->value()==0) return m_Image;
+    
+    QRgb col;
+    int width = m_Image.width();
+    int height = m_Image.height();
+    int otstWidth = ((width/2)*(ui->Slider->value()/100.0));
+    int otstHeight = ((height/2)*(ui->Slider->value()/100.0));
+	int r,g,b;
+    double rSum = 0, gSum = 0, bSum = 0, kSum = 0;
+	
+	
+	int kernelWidth = 1 + 2*value;
+	int kernelHeight = 1 + 2*value;
+	
+		   
+	
+
+    setState(false);
+
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
+           rSum = 0, gSum = 0, bSum = 0, kSum = 0;
+		   
+			m_listImageOut[4 * (width * y + x) + 3] = m_listImageIn[4 * (width * y + x) + 3];
+
+            if(((x >= otstWidth && x<=width-otstWidth) && (y >= otstHeight &&  y<= height-otstHeight)) && (otstHeight != height && otstWidth != width))
+            {
+				m_listImageOut[4 * (width * y + x) + 0] = m_listImageIn[4 * (width * y + x) + 0];
+                m_listImageOut[4 * (width * y + x) + 1] = m_listImageIn[4 * (width * y + x) + 1];
+                m_listImageOut[4 * (width * y + x) + 2] = m_listImageIn[4 * (width * y + x) + 2];
+                continue;
+            }
+
+            for (int i = 0; i < kernelWidth; i++)
+            {
+                for (int j = 0; j < kernelHeight; j++)
+                {
+                    int pixelPosX = x + (i - (kernelWidth / 2));
+                    int pixelPosY = y + (j - (kernelHeight / 2));
+                    if ((pixelPosX < 0) ||
+                        (pixelPosX >= width) ||
+                        (pixelPosY < 0) ||
+                        (pixelPosY >= height)) continue;
+
+                     b = m_listImageIn[4 * (width * pixelPosY + pixelPosX) + 0];
+                     g = m_listImageIn[4 * (width * pixelPosY + pixelPosX) + 1];
+                     r = m_listImageIn[4 * (width * pixelPosY + pixelPosX) + 2];
+
+
+                    double kernelVal = 1.0;
+
+                    rSum += r * kernelVal;
+                    gSum += g * kernelVal;
+                    bSum += b * kernelVal;
+
+                    kSum += kernelVal;
+                }
+            }
+
+            if (kSum <= 0) kSum = 1;
+           
+            rSum /= kSum;
+            if (rSum < 0) rSum = 0;
+            if (rSum > 255) rSum = 255;
+
+            gSum /= kSum;
+            if (gSum < 0) gSum = 0;
+            if (gSum > 255) gSum = 255;
+
+            bSum /= kSum;
+            if (bSum < 0) bSum = 0;
+            if (bSum > 255) bSum = 255;
+
+			m_listImageOut[4 * (width * y + x) + 0] = bSum;
+			m_listImageOut[4 * (width * y + x) + 1] = gSum;
+			m_listImageOut[4 * (width * y + x) + 2] = rSum;
+          }
+    }
+	return QImage((unsigned char *)m_listImageOut,m_Image.width(),m_Image.height(),m_Image.format());
 }

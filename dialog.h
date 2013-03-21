@@ -4,6 +4,7 @@
 #include <QGraphicsItem>
 #include <QDialog>
 
+
 namespace Ui {
 class Dialog;
 }
@@ -39,31 +40,48 @@ public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
     int gaussCoef(double sigma, double a[3], double *b0);
-private slots:
-    void on_pushButton_clicked();
-    void testFunc();
-    void on_pushButton_2_clicked();
-    void setState(bool state);
+	
+	void setState(bool state);
+	double Max(double a,double b,double c);
+	double Min(double a,double b,double c);
     hsv rgb2hsv(rgb in);
     rgb hsv2rgb(hsv in);
     hsl rgbToHsl(rgb in);
     double hue2rgb(double p,double q,double t);
     rgb  hslToRgb(hsl in);
-    QImage addColour(int value);
+    int Gray(rgb structRgb);
+	
+	QImage sepiaEffects(int val);
+	QImage addColour(int value);
+	QImage addShine(int value);
+	QImage addContrast(int value);
+	QImage addBlur(int value);
+    QImage colourFilter(rgb options);
+    QImage contrastFilter(int value);
+	QImage addTexture();
 
+private slots:
+    //void on_pushButton_clicked();
+    void on_pushButton_2_clicked();
+    
     void on_horizontalSlider_valueChanged(int value);
 
     void on_Slider_valueChanged(int value);
-
-    void on_ButtonColourMsk_clicked();
 
     void on_SliderColour_valueChanged(int value);
 
     void on_SliderShine_valueChanged(int value);
 
-    void on_checkSepia_clicked();
+	void on_SliderContrast_valueChanged(int value);
 
-    void on_SliderContrast_valueChanged(int value);
+	void onSliderSepia(int value);
+
+	void onRgbSliders(int value);
+
+	void onTexture();
+	
+
+
 
 private:
     Ui::Dialog *ui;
@@ -73,9 +91,10 @@ private:
     QByteArray m_array;
     QImage m_Image;
     QImage m_outImage;
+	QImage m_Texture;
     unsigned char *m_listImageIn;
     unsigned char *m_listImageOut;
-    ;
+	unsigned char *m_listTexture;
 };
 
 #endif // DIALOG_H
